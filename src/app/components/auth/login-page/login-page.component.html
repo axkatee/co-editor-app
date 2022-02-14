@@ -1,0 +1,7 @@
+<p>login-page works!</p>
+<form [formGroup]="loginForm">
+  <input formControlName="email" placeholder="email">
+  <input formControlName="password" placeholder="password">
+</form>
+<button [disabled]="!loginForm.valid" (click)="login()">Login</button>
+<button (click)="goToSignUpPage()">Go to signup page</button>

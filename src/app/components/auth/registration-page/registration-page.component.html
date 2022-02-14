@@ -1,0 +1,8 @@
+<p>registration-page works!</p>
+<form [formGroup]="registrationForm">
+  <input formControlName="name" placeholder="name">
+  <input formControlName="email" placeholder="email">
+  <input formControlName="password" placeholder="password">
+</form>
+<button [disabled]="!registrationForm.valid" (click)="signUp()">Sign Up</button>
+<button (click)="goToLoginPage()">Go to login page</button>
