@@ -31,12 +31,14 @@ export class LoginPageComponent implements OnInit {
   }
 
   login(): void {
-    const email = this.loginForm.controls['email'].value;
-    const password = this.loginForm.controls['password'].value;
-    console.log(email, password)
-    this.http.post(environment + '/auth/login', { email, password }).subscribe(res => {
+    const email = this.loginForm.controls['email'].value.toString();
+    const password = this.loginForm.controls['password'].value.toString();
+    this.http.post(environment.apiUrl + 'auth/login', { email, password }).subscribe((res: any) => {
+      console.log(res)
+      localStorage.setItem('auth_data', res.message);
+      this.router.navigate(['/conversations']).then();
     }, error => {
-      this.notification.open(error.message, 'ok', notificationConfig);
+      this.notification.open(error.error.message, 'ok', notificationConfig);
     });
   }
 }

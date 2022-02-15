@@ -1,0 +1,43 @@
+.create-conversation {
+  margin: 20px 0 10px 20px;
+}
+
+.main-block {
+  display: flex;
+  flex-wrap: wrap;
+
+  .conversation-blocks {
+    margin: 10px;
+    border: 1px solid black;
+    background-color: antiquewhite;
+    min-width: 200px;
+    height: 200px;
+
+    .action-btns {
+      width: 200px;
+      margin-top: 100px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+
+      .delete-btn {
+        cursor: pointer;
+        background-color: #ffd8e5;;
+        border-radius: 0;
+      }
+
+      .open-btn, .add-user-btn, .info-btn {
+        cursor: pointer;
+        background-color: white;
+        border-radius: 0;
+        margin-right: 10px;
+      }
+
+      .add-user-btn, .info-btn {
+        margin-bottom: 10px;
+        margin-right: 5px;
+        margin-left: 5px;
+      }
+    }
+  }
+}

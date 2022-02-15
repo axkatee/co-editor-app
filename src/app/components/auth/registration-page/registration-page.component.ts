@@ -39,10 +39,10 @@ export class RegistrationPageComponent implements OnInit {
     const name = this.registrationForm.controls['name'].value;
     const email = this.registrationForm.controls['email'].value;
     const password = this.registrationForm.controls['password'].value;
-    this.http.post(environment + '/auth/create', { name, email, password }).subscribe(res => {
+    this.http.post(environment.apiUrl + 'auth/create', { name, email, password }).subscribe(res => {
       this.router.navigate(['/login']).then();
     }, error => {
-      this.notification.open(error.message, 'ok', notificationConfig);
+      this.notification.open(error.error.message, 'ok', notificationConfig);
     });
   }
 }

@@ -1,0 +1,14 @@
+<button class="create-conversation" (click)="openDialog('createConversation')">+ create conversation</button>
+<button class="create-conversation" (click)="signOut()">sign out</button>
+<div class="main-block">
+  <div class="conversation-blocks" *ngFor="let conversation of conversations">
+    <div class="title">Name: {{conversation.name}}</div>
+    <div class="last-action">Last edited by: {{conversation.edited_by}}</div>
+    <div class="action-btns">
+      <button class="add-user-btn" (click)="openDialog('addUser', conversation)">+ add user</button>
+      <button class="info-btn" (click)="openDialog('showInfo', conversation)">show info</button>
+      <button class="open-btn" (click)="openConversation(conversation)">open</button>
+      <button class="delete-btn" (click)="openDialog('delete', conversation)">delete</button>
+    </div>
+  </div>
+</div>

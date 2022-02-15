@@ -1,0 +1,7 @@
+<div class="dialog">
+  <h1 mat-dialog-title>Delete {{data.conversation.name}}?</h1>
+  <div class="action-btns" mat-dialog-actions>
+    <button class="open-btn" (click)="deleteConversation(data.conversation)">Delete</button>
+    <button class="delete-btn" (click)="closeDialog()">Close</button>
+  </div>
+</div>

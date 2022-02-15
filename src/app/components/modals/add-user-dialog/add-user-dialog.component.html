@@ -1,0 +1,15 @@
+<div class="dialog">
+  <h1 mat-dialog-title>Add user</h1>
+  <mat-form-field appearance="fill">
+    <mat-label>Select user</mat-label>
+    <mat-select [(ngModel)]="selectedUser">
+      <mat-option *ngFor="let user of users" [value]="user">
+        {{user.name}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <div class="action-btns" mat-dialog-actions>
+    <button class="add-user-btn" (click)="addUserToConversation(data.conversation)">Add user</button>
+    <button class="close-btn" (click)="closeDialog()">Close</button>
+  </div>
+</div>
