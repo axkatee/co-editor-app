@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import { IConversation } from "../../../interfaces/interface";
 import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
@@ -11,6 +11,8 @@ import {
 import { notificationConfig } from "../../../configs/config";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { CreateConversationComponent } from "../../modals/create-conversation/create-conversation.component";
+import { ProjectService } from "../../../services/project.service";
+import {Subscription} from "rxjs";
 import {AuthService} from "../../../services/auth.service";
 
 @Component({
@@ -23,18 +25,37 @@ export class MainPageComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
+    private projectService: ProjectService,
+    private authService: AuthService,
     private router: Router,
     private dialog: MatDialog,
-    private notification: MatSnackBar,
-    private authService: AuthService
+    private notification: MatSnackBar
   ) { }
 
   ngOnInit(): void {
-    this.conversations = [{id: '111', name: 'weqwe', edited_by: 'dfshjfhsf'}, {id: '222', name: 'dfgdfg', edited_by: 'dfshjfhsf'}, {id: '333', name: 'sdfdf', edited_by: 'dfshjfhsf'}, {id: '444', name: 'sdsds', edited_by: 'dfshjfhsf'}, {id: '555', name: 'sdsds', edited_by: 'dfshjfhsf'}, {id: '666', name: 'sdsds', edited_by: 'dfshjfhsf'}, {id: '111', name: 'tghfyn', edited_by: 'dfshjfhsf'}, {id: '777', name: 'tukyi', edited_by: 'dfshjfhsf'}, {id: '888', name: 'sdsds', edited_by: 'dfshjfhsf'}];
+    this.projectService.getConversations().subscribe(res => {
+      this.setConversations(res.message.listOfFavoriteConversations, res.message.listOfUnfavoriteConversations);
+    })
+  }
+
+  setConversations(favoriteConversations: IConversation[], unfavoriteConversations: IConversation[]): void {
+    favoriteConversations?.forEach(conversation => {
+      this.conversations.push(conversation);
+      conversation.isFavorite = true;
+    });
+    unfavoriteConversations?.forEach(conversation => {
+      this.conversations.push(conversation);
+    });
   }
 
   openConversation(conversation: IConversation): void {
     this.router.navigate([`/conversations/${conversation.id}`]).then();
+  }
+
+  changeConversationFavoriteState(conversation: IConversation): void {
+    this.projectService.changeConversationFavouriteState(conversation.id, conversation.isFavorite).subscribe(res => {
+      console.log(res.message);
+    });
   }
 
   openDialog(dialogName: string, conversation?: IConversation): void {

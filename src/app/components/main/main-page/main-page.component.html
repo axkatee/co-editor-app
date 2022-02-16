@@ -3,7 +3,7 @@
 <div class="main-block">
   <div class="conversation-blocks" *ngFor="let conversation of conversations">
     <div class="title">Name: {{conversation.name}}</div>
-    <div class="last-action">Last edited by: {{conversation.edited_by}}</div>
+    <input type="checkbox" [(ngModel)]="conversation.isFavorite" (change)="changeConversationFavoriteState(conversation)">
     <div class="action-btns">
       <button class="add-user-btn" (click)="openDialog('addUser', conversation)">+ add user</button>
       <button class="info-btn" (click)="openDialog('showInfo', conversation)">show info</button>

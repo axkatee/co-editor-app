@@ -1,7 +1,10 @@
 <div class="dialog">
   <h1 mat-dialog-title>Create conversation</h1>
+  <form [formGroup]="conversationForm">
+    <input formControlName="name" placeholder="Conversation name">
+  </form>
   <div class="action-btns" mat-dialog-actions>
-    <button class="create-btn" (click)="createConversation()">Create</button>
+    <button class="create-btn" [disabled]="!conversationForm.valid" (click)="createConversation()">Create</button>
     <button class="close-btn" (click)="closeDialog()">Close</button>
   </div>
 </div>

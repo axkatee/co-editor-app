@@ -1,1 +1,16 @@
-<p>conversation-page works!</p>
+<div class="conversation-page">
+  <div class="header">
+    <h1>Conversation</h1>
+    <button class="save-btn" (click)="saveConversation()">save</button>
+  </div>
+  <div class="content">
+    <div class="mutations-content">
+      <div class="mutations">Last edit:</div>
+      <div class="contributors" *ngFor="let user of users">
+        <div>Name: {{user.name}}</div>
+        <div>Count of mutations: {{user.countOfMutations}}</div>
+      </div>
+    </div>
+    <textarea autofocus class="textbox" [(ngModel)]="text">{{text}}</textarea>
+  </div>
+</div>

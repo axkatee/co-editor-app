@@ -1,10 +1,11 @@
 export interface IConversation {
   id: string;
   name: string;
-  edited_by: string;
-  author?: string;
-  contributors?: string;
+  mutations: string;
+  author: IUser;
+  contributors?: IUser[];
   text?: string;
+  isFavorite: boolean;
 }
 
 export interface IDialogData {
@@ -15,6 +16,12 @@ export interface IUser {
   id: string;
   name: string;
   email: string;
+  countOfMutations?: number;
+}
+
+export interface IMutation {
+  userId: string;
+  countOfMutations: number;
 }
 
 export interface IResponse {

@@ -1,8 +1,8 @@
 <div class="dialog">
   <h1 mat-dialog-title>Info about {{data.conversation.name}}</h1>
   <div mat-dialog-content>Name: {{data.conversation.name}}</div>
-  <div mat-dialog-content>Last edited by: {{data.conversation.edited_by}}</div>
-  <div mat-dialog-content>Author: {{data.conversation.author}}</div>
-  <div mat-dialog-content>Contributors: {{data.conversation.contributors}}</div>
+  <div mat-dialog-content>Last edited by: {{editedBy}}</div>
+  <div mat-dialog-content>Author: {{data.conversation.author.name}} ({{data.conversation.author.email}})</div>
+  <div mat-dialog-content>Contributors: {{contributors}}</div>
   <button class="close-btn" (click)="closeDialog()">Close</button>
 </div>

@@ -22,6 +22,8 @@ import { ConversationPageComponent } from './components/main/conversation-page/c
 import { CreateConversationComponent } from './components/modals/create-conversation/create-conversation.component';
 import { AuthGuard } from "./auth.guard";
 import {MatSelectModule} from "@angular/material/select";
+import {MatInputModule} from "@angular/material/input";
+import {MatCheckboxModule} from "@angular/material/checkbox";
 
 @NgModule({
   declarations: [
@@ -35,20 +37,22 @@ import {MatSelectModule} from "@angular/material/select";
     ConversationPageComponent,
     CreateConversationComponent
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
-    FormsModule,
-    ReactiveFormsModule,
-    OverlayModule,
-    MatPaginatorModule,
-    MatDialogModule,
-    MatTableModule,
-    MatFormFieldModule,
-    MatSelectModule
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        HttpClientModule,
+        FormsModule,
+        ReactiveFormsModule,
+        OverlayModule,
+        MatPaginatorModule,
+        MatDialogModule,
+        MatTableModule,
+        MatFormFieldModule,
+        MatSelectModule,
+        MatInputModule,
+        MatCheckboxModule
+    ],
   providers: [FormService, MatSnackBar, AuthGuard],
   bootstrap: [AppComponent]
 })

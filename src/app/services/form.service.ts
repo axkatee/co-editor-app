@@ -42,4 +42,14 @@ export class FormService {
       ])
     });
   }
+
+  conversationForm(): FormGroup {
+    return new FormBuilder().group({
+      name: new FormControl('', [
+        Validators.required,
+        Validators.minLength(4),
+        Validators.maxLength(32)
+      ])
+    });
+  }
 }
