@@ -1,8 +1,10 @@
-<p>registration-page works!</p>
-<form [formGroup]="registrationForm">
-  <input formControlName="name" placeholder="name">
-  <input formControlName="email" placeholder="email">
-  <input formControlName="password" placeholder="password">
-</form>
-<button [disabled]="!registrationForm.valid" (click)="signUp()">Sign Up</button>
-<button (click)="goToLoginPage()">Go to login page</button>
+<div class="signup-block">
+  <h1>Sign up</h1>
+  <form class="form-block" [formGroup]="registrationForm">
+    <input class="signup-input" formControlName="name" placeholder="name">
+    <input class="signup-input" formControlName="email" placeholder="email">
+    <input class="signup-input" formControlName="password" placeholder="password">
+  </form>
+  <button class="signup-btn" [disabled]="!registrationForm.valid" (click)="signUp()">Sign Up</button>
+  <button class="signup-btn" (click)="goToLoginPage()">Go to login page</button>
+</div>

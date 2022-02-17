@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
+import { ProjectService } from "../../../services/project.service";
 import { IConversation, IDialogData } from "../../../interfaces/interface";
-import {ProjectService} from "../../../services/project.service";
 
 @Component({
   selector: 'app-delete-conversation-dialog',
@@ -22,7 +22,10 @@ export class DeleteConversationDialogComponent {
 
   deleteConversation(conversationId: string): void {
     this.projectService.deleteConversation(conversationId).subscribe(res => {
-      console.log(res.message);
+      const conversations: IConversation[] = [];
+      conversations.push(res.message.listOfFavoriteConversations);
+      conversations.push(res.message.listOfUnfavoriteConversations);
+      this.projectService.observableConversations.next(conversations);
     });
     this.closeDialog();
   }

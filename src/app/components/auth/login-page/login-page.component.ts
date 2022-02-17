@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { environment } from "../../../../environments/environment";
 import { Router } from "@angular/router";
 import { FormGroup } from "@angular/forms";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { AuthService } from "../../../services/auth.service";
 import { FormService } from "../../../services/form.service";
 import { notificationConfig } from "../../../configs/config";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import {AuthService} from "../../../services/auth.service";
+import { environment } from "../../../../environments/environment";
 
 @Component({
   selector: 'app-login-page',
@@ -35,7 +35,7 @@ export class LoginPageComponent implements OnInit {
   login(): void {
     const email = this.loginForm.controls['email'].value.toString();
     const password = this.loginForm.controls['password'].value.toString();
-    this.http.post(environment.apiUrl + 'auth/login', { email, password }).subscribe((res: any) => {
+    this.authService.signIn(email, password).subscribe((res: any) => {
       localStorage.setItem('auth_data', res.message);
       this.router.navigate(['/conversations']).then();
     }, error => {

@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core';
-import { AuthService } from "./auth.service";
 import { HttpClient } from "@angular/common/http";
+import { catchError, Observable, Subject, throwError } from "rxjs";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { environment } from "../../environments/environment";
+import { AuthService } from "./auth.service";
+import { IConversation, IUser } from "../interfaces/interface";
 import { notificationConfig } from "../configs/config";
-import {IConversation, IUser} from "../interfaces/interface";
-import { catchError, Observable, throwError } from "rxjs";
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProjectService {
+  public observableConversations: Subject<IConversation[]> = new Subject<IConversation[]>();
   private userId: any;
 
   constructor(

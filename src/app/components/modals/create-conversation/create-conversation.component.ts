@@ -1,15 +1,9 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
-import { IDialogData } from "../../../interfaces/interface";
-import { HttpClient } from "@angular/common/http";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import { AuthService } from "../../../services/auth.service";
-import { FormService } from "../../../services/form.service";
 import { FormGroup } from "@angular/forms";
-import { notificationConfig } from "../../../configs/config";
-import { environment } from "../../../../environments/environment";
-import {finalize} from "rxjs";
-import {ProjectService} from "../../../services/project.service";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
+import { ProjectService } from "../../../services/project.service";
+import { FormService } from "../../../services/form.service";
+import { IConversation, IDialogData } from "../../../interfaces/interface";
 
 @Component({
   selector: 'app-create-conversation',
@@ -32,7 +26,12 @@ export class CreateConversationComponent implements OnInit {
 
   createConversation(): void {
     const name: string = this.conversationForm.controls['name'].value.toString();
-    this.projectService.createConversation(name).subscribe(res => console.log(res.message));
+    this.projectService.createConversation(name).subscribe(res => {
+      const conversations: IConversation[] = [];
+      conversations.push(res.message.listOfFavoriteConversations);
+      conversations.push(res.message.listOfUnfavoriteConversations);
+      this.projectService.observableConversations.next(conversations);
+    });
 
     this.closeDialog();
   }

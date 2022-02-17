@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { catchError, Observable, throwError } from "rxjs";
+import { Router } from "@angular/router";
 import { HttpClient } from "@angular/common/http";
+import { catchError, Observable, throwError } from "rxjs";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { environment } from "../../environments/environment";
 import { notificationConfig } from "../configs/config";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import {Router} from "@angular/router";
 
 @Injectable({
   providedIn: 'root'
@@ -29,6 +29,30 @@ export class AuthService {
         this.notification.open('Server is not alive', 'ok', notificationConfig);
         localStorage.removeItem('auth_data');
         this.router.navigate(['/login']).then();
+        return throwError(error);
+      }));
+  }
+
+  signIn(email: string, password: string): Observable<any> {
+    return this.http.post(environment.apiUrl + 'auth/login', { email, password }).pipe(
+      catchError(error => {
+        this.notification.open(error.error.message, 'ok', notificationConfig);
+        return throwError(error);
+      }));
+  }
+
+  signUp(name: string, email: string, password: string): Observable<any> {
+    return this.http.post(environment.apiUrl + 'auth/create', { name, email, password }).pipe(
+      catchError(error => {
+        this.notification.open(error.error.message, 'ok', notificationConfig);
+        return throwError(error);
+      }));
+  }
+
+  getUsers(): Observable<any> {
+    return this.http.get(environment.apiUrl + 'auth/users').pipe(
+      catchError(error => {
+        this.notification.open(error.error.message, 'ok', notificationConfig);
         return throwError(error);
       }));
   }

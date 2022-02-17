@@ -1,12 +1,10 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { IDialogData, IUser } from "../../../interfaces/interface";
-import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { HttpClient } from "@angular/common/http";
-import { environment } from "../../../../environments/environment";
-import { notificationConfig } from "../../../configs/config";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { AuthService } from "../../../services/auth.service";
 import { ProjectService } from "../../../services/project.service";
+import { IConversation, IDialogData, IUser } from "../../../interfaces/interface";
 
 @Component({
   selector: 'app-add-user-dialog',
@@ -14,8 +12,10 @@ import { ProjectService } from "../../../services/project.service";
   styleUrls: ['./add-user-dialog.component.less']
 })
 export class AddUserDialogComponent implements OnInit {
-  public users: any[] = [];
+  public users: IUser[] = [];
   public selectedUser: IUser;
+
+  private contributors: string[];
 
   constructor(
     private http: HttpClient,
@@ -27,13 +27,10 @@ export class AddUserDialogComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    const contributors = this.data.conversation.contributors?.map(user => user.id);
+    this.contributors = this.data.conversation.contributors?.map(user => user.id) || [];
 
-    this.http.get(environment.apiUrl + 'auth/users').subscribe((res: any) => {
-      this.users = res.message;
-      this.users = this.users.filter(user => user.id !== this.authService.userId && !contributors?.includes(user.id));
-    }, error => {
-      this.notification.open(error.error.message, 'ok', notificationConfig);
+    this.authService.getUsers().subscribe((res: any) => {
+      this.setUsers(res.message);
     });
   }
 
@@ -41,8 +38,20 @@ export class AddUserDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
+  setUsers(users: IUser[]): void {
+    this.users = users;
+    this.users = this.users.filter(user => user.id !== this.authService.userId && !this.contributors?.includes(user.id));
+  }
+
   addUserToConversation(conversationId: string): void {
-    this.projectService.addUserToConversation(conversationId, this.selectedUser).subscribe()
+    if (this.selectedUser) {
+      this.projectService.addUserToConversation(conversationId, this.selectedUser).subscribe(res => {
+        const conversations: IConversation[] = [];
+        conversations.push(res.message.listOfFavoriteConversations);
+        conversations.push(res.message.listOfUnfavoriteConversations);
+        this.projectService.observableConversations.next(conversations);
+      });
+    }
     this.closeDialog();
   }
 

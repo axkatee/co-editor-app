@@ -1,7 +1,9 @@
-<p>login-page works!</p>
-<form [formGroup]="loginForm">
-  <input formControlName="email" placeholder="email">
-  <input formControlName="password" placeholder="password">
-</form>
-<button [disabled]="!loginForm.valid" (click)="login()">Login</button>
-<button (click)="goToSignUpPage()">Go to signup page</button>
+<div class="login-block">
+  <h1>Sign in</h1>
+  <form class="form-block" [formGroup]="loginForm">
+    <input class="login-input" formControlName="email" placeholder="email">
+    <input class="login-input" formControlName="password" placeholder="password">
+  </form>
+  <button class="login-btn" [disabled]="!loginForm.valid" (click)="login()">Login</button>
+  <button class="login-btn" (click)="goToSignUpPage()">Go to signup page</button>
+</div>

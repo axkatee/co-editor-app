@@ -1,7 +1,7 @@
 export interface IConversation {
   id: string;
   name: string;
-  mutations: string;
+  mutations: IMutation[];
   author: IUser;
   contributors?: IUser[];
   text?: string;
@@ -22,9 +22,4 @@ export interface IUser {
 export interface IMutation {
   userId: string;
   countOfMutations: number;
-}
-
-export interface IResponse {
-  ok: boolean;
-  message: any;
 }
