@@ -6,10 +6,10 @@
     <input type="checkbox" id="favoritesCheckbox" [(ngModel)]="conversation.isFavorite" (change)="changeConversationFavoriteState(conversation)">
     <label for="favoritesCheckbox">Favorite</label>
     <div class="action-btns">
-      <button class="action-btn" (click)="openDialog('addUser', conversation)">+ add user</button>
-      <button class="action-btn" (click)="openDialog('showInfo', conversation)">show info</button>
-      <button class="action-btn" (click)="openConversation(conversation)">open</button>
-      <button class="delete-btn" (click)="openDialog('delete', conversation)">delete</button>
+      <button class="white-btn" (click)="openDialog('addUser', conversation)">+ add user</button>
+      <button class="white-btn" (click)="openDialog('showInfo', conversation)">show info</button>
+      <button class="white-btn" (click)="openConversation(conversation)">open</button>
+      <button class="red-btn" (click)="openDialog('delete', conversation)">delete</button>
     </div>
   </div>
 </div>
