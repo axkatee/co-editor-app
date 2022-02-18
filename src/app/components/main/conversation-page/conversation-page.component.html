@@ -1,7 +1,6 @@
 <div class="conversation-page">
   <div class="header">
     <h1>Conversation</h1>
-    <button class="red-btn" (click)="saveConversation()">save</button>
   </div>
   <div class="content">
     <div class="mutations-content">
@@ -11,6 +10,8 @@
         <div>Count of mutations: {{user.countOfMutations}}</div>
       </div>
     </div>
-    <textarea autofocus class="textbox" [(ngModel)]="text">{{text}}</textarea>
+    <textarea autofocus class="textbox"
+              [(ngModel)]="text"
+              (keydown)="onKeyDown()">{{text}}</textarea>
   </div>
 </div>

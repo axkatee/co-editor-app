@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import { Router } from "@angular/router";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ProjectService } from "../../../services/project.service";
 import { notificationConfig } from "../../../configs/matSnackbarConfig";
 import { IConversation, IMutation, IUser } from "../../../interfaces/interface";
+import { debounceTime, distinctUntilChanged, Subject } from "rxjs";
 
 @Component({
   selector: 'app-conversation-page',
@@ -15,6 +16,7 @@ export class ConversationPageComponent implements OnInit {
   public users: IUser[] = [];
 
   private conversationId: string;
+  private textChange = new Subject();
 
   constructor(
     private projectService: ProjectService,
@@ -24,6 +26,11 @@ export class ConversationPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.conversationId = this.router.url.split('conversations/')[1];
+
+    this.textChange.pipe(
+      debounceTime(1000),
+      distinctUntilChanged(),
+    ).subscribe(() => this.saveConversation());
 
     this.setConversationsUpdateHandler();
     this.getInfoAboutConversation();
@@ -37,7 +44,6 @@ export class ConversationPageComponent implements OnInit {
   }
 
   findCurrentConversation(conversations: IConversation[]): void {
-    console.log(conversations)
     conversations.forEach(conversation => {
       if (conversation.id === this.conversationId) {
         this.setInfoAboutConversation(conversation);
@@ -74,11 +80,13 @@ export class ConversationPageComponent implements OnInit {
     this.setInfoAboutConversation(conversation);
   }
 
+  onKeyDown(): void {
+    this.textChange.next(this.text);
+  }
+
   saveConversation(): void {
-    if (this.text) {
-      this.projectService.editConversation(this.conversationId, this.text).subscribe(res => {
-        this.notification.open('Saved!', 'ok', notificationConfig);
-      });
-    }
+    this.projectService.editConversation(this.conversationId, this.text).subscribe(res => {
+      this.notification.open('Saved!', 'ok', notificationConfig);
+    });
   }
 }
