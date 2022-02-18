@@ -3,7 +3,7 @@ import { FormGroup } from "@angular/forms";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { ProjectService } from "../../../services/project.service";
 import { FormService } from "../../../services/form.service";
-import { IConversation, IDialogData } from "../../../interfaces/interface";
+import { IDialogData } from "../../../interfaces/interface";
 
 @Component({
   selector: 'app-create-conversation',
@@ -26,12 +26,7 @@ export class CreateConversationComponent implements OnInit {
 
   createConversation(): void {
     const name: string = this.conversationForm.controls['name'].value.toString();
-    this.projectService.createConversation(name).subscribe(res => {
-      const conversations: IConversation[] = [];
-      conversations.push(res.message.listOfFavoriteConversations);
-      conversations.push(res.message.listOfUnfavoriteConversations);
-      this.projectService.observableConversations.next(conversations);
-    });
+    this.projectService.createConversation(name).subscribe();
 
     this.closeDialog();
   }

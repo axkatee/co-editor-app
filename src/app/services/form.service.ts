@@ -8,7 +8,7 @@ export class FormService {
 
   constructor() { }
 
-  loginForm(): FormGroup {
+  public loginForm(): FormGroup {
     return new FormBuilder().group({
       email: new FormControl('', [
         Validators.required,
@@ -23,7 +23,7 @@ export class FormService {
     });
   }
 
-  registrationForm(): FormGroup {
+  public registrationForm(): FormGroup {
     return new FormBuilder().group({
       name: new FormControl('', [
         Validators.required,
@@ -43,7 +43,7 @@ export class FormService {
     });
   }
 
-  conversationForm(): FormGroup {
+  public conversationForm(): FormGroup {
     return new FormBuilder().group({
       name: new FormControl('', [
         Validators.required,

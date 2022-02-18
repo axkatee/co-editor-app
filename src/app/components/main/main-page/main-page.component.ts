@@ -1,16 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { Subject } from "rxjs";
 import { Router } from "@angular/router";
-import { MatDialog } from "@angular/material/dialog";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import { AuthService } from "../../../services/auth.service";
-import { ProjectService } from "../../../services/project.service";
-import { notificationConfig } from "../../../configs/config";
-import { IConversation } from "../../../interfaces/interface";
+import { BehaviorSubject } from "rxjs";
 import { AddUserDialogComponent } from "../../modals/add-user-dialog/add-user-dialog.component";
 import { InfoDialogComponent } from "../../modals/info-dialog/info-dialog.component";
 import { DeleteConversationDialogComponent } from "../../modals/delete-conversation-dialog/delete-conversation-dialog.component";
 import { CreateConversationComponent } from "../../modals/create-conversation/create-conversation.component";
+import { MatDialog } from "@angular/material/dialog";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { AuthService } from "../../../services/auth.service";
+import { ProjectService } from "../../../services/project.service";
+import { SocketService } from "../../../services/socket.service";
+import { notificationConfig } from "../../../configs/matSnackbarConfig";
+import { IConversation, IResponse } from "../../../interfaces/interface";
 
 @Component({
   selector: 'app-main-page',
@@ -18,35 +19,43 @@ import { CreateConversationComponent } from "../../modals/create-conversation/cr
   styleUrls: ['./main-page.component.less']
 })
 export class MainPageComponent implements OnInit {
-  public conversations: Subject<IConversation[]> = new Subject<IConversation[]>();
+  public conversations = new BehaviorSubject<IConversation[]>([]);
+  private userId: string;
 
   constructor(
     private projectService: ProjectService,
+    private authService: AuthService,
+    private socketService: SocketService,
     private router: Router,
     private dialog: MatDialog,
     private notification: MatSnackBar
   ) { }
 
   ngOnInit(): void {
-    this.projectService.getConversations().subscribe(res => {
-      this.setConversations(res.message.listOfFavoriteConversations, res.message.listOfUnfavoriteConversations);
-    });
+    this.userId = this.authService.userId;
+    this.socketService.setSocketInfo(this.authService.userId);
 
-    this.projectService.observableConversations.subscribe((conversations: any) => {
-      this.setConversations(conversations[0], conversations[1]);
+    this.setConversationsUpdateHandler();
+    this.getConversations();
+  }
+
+  setConversationsUpdateHandler(): void {
+    this.projectService.conversations$.subscribe((conversations: IConversation[]) => {
+      this.setConversations(conversations);
     });
   }
 
-  setConversations(favoriteConversations: IConversation[], unfavoriteConversations: IConversation[]): void {
-    const filteredConversations: IConversation[] = [];
-    favoriteConversations?.forEach((conversation: IConversation) => {
-      filteredConversations.push(conversation);
-      conversation.isFavorite = true;
+  getConversations(): void {
+    this.projectService.getConversations().subscribe((res: IResponse) => {
+      this.setConversations(res.message);
     });
-    unfavoriteConversations?.forEach((conversation: IConversation) => {
-      filteredConversations.push(conversation);
-    });
-    this.conversations.next(filteredConversations);
+  }
+
+  setConversations(conversations: any): void {
+    const filteredConversations = this.projectService.filterConversationsResponse(conversations);
+    const { favoriteConversations, unfavoriteConversations } = this.projectService.filterConversationsToFavoriteAndUnfavorite(filteredConversations);
+    const conversationsToRender = this.projectService.setConversations(favoriteConversations, unfavoriteConversations);
+    this.conversations.next(conversationsToRender);
   }
 
   openConversation(conversation: IConversation): void {
@@ -54,12 +63,7 @@ export class MainPageComponent implements OnInit {
   }
 
   changeConversationFavoriteState(conversation: IConversation): void {
-    this.projectService.changeConversationFavouriteState(conversation.id, conversation.isFavorite).subscribe(res => {
-      const conversations: IConversation[] = [];
-      conversations.push(res.message.listOfFavoriteConversations);
-      conversations.push(res.message.listOfUnfavoriteConversations);
-      this.projectService.observableConversations.next(conversations);
-    });
+    this.projectService.changeConversationFavouriteState(conversation.id, conversation.isFavorite).subscribe();
   }
 
   openDialog(dialogName: string, conversation?: IConversation): void {

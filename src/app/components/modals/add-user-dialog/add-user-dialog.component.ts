@@ -4,7 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { AuthService } from "../../../services/auth.service";
 import { ProjectService } from "../../../services/project.service";
-import { IConversation, IDialogData, IUser } from "../../../interfaces/interface";
+import { IDialogData, IResponse, IUser } from "../../../interfaces/interface";
 
 @Component({
   selector: 'app-add-user-dialog',
@@ -24,13 +24,15 @@ export class AddUserDialogComponent implements OnInit {
     private notification: MatSnackBar,
     private dialogRef: MatDialogRef<IDialogData>,
     @Inject(MAT_DIALOG_DATA) public data: IDialogData
-  ) { }
+  ) {
+  }
+
 
   ngOnInit(): void {
     this.contributors = this.data.conversation.contributors?.map(user => user.id) || [];
 
-    this.authService.getUsers().subscribe((res: any) => {
-      this.setUsers(res.message);
+    this.authService.getUsers().subscribe((res: IResponse) => {
+      this.setUsers(res.message as IUser[]);
     });
   }
 
@@ -44,14 +46,7 @@ export class AddUserDialogComponent implements OnInit {
   }
 
   addUserToConversation(conversationId: string): void {
-    if (this.selectedUser) {
-      this.projectService.addUserToConversation(conversationId, this.selectedUser).subscribe(res => {
-        const conversations: IConversation[] = [];
-        conversations.push(res.message.listOfFavoriteConversations);
-        conversations.push(res.message.listOfUnfavoriteConversations);
-        this.projectService.observableConversations.next(conversations);
-      });
-    }
+    this.selectedUser && this.projectService.addUserToConversation(conversationId, this.selectedUser).subscribe();
     this.closeDialog();
   }
 

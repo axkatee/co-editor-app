@@ -22,6 +22,7 @@ import { InfoDialogComponent } from './components/modals/info-dialog/info-dialog
 import { AddUserDialogComponent } from './components/modals/add-user-dialog/add-user-dialog.component';
 import { ConversationPageComponent } from './components/main/conversation-page/conversation-page.component';
 import { CreateConversationComponent } from './components/modals/create-conversation/create-conversation.component';
+import { SocketService } from "./services/socket.service";
 import { FormService } from "./services/form.service";
 import { AuthGuard } from "./auth.guard";
 
@@ -53,7 +54,7 @@ import { AuthGuard } from "./auth.guard";
         MatInputModule,
         MatCheckboxModule
     ],
-  providers: [FormService, MatSnackBar, AuthGuard],
+  providers: [FormService, MatSnackBar, AuthGuard, SocketService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -4,13 +4,13 @@ import { HttpClient } from "@angular/common/http";
 import { catchError, Observable, throwError } from "rxjs";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { environment } from "../../environments/environment";
-import { notificationConfig } from "../configs/config";
+import { notificationConfig } from "../configs/matSnackbarConfig";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  public userId: any = '';
+  public userId: string = '';
 
   constructor(
     private http: HttpClient,
@@ -19,11 +19,11 @@ export class AuthService {
   ) { }
 
 
-  takeTokenFromLocalStorage(): void {
-    this.userId = localStorage.getItem('auth_data');
+  public getTokenFromLocalStorage(): void {
+    this.userId = localStorage.getItem('auth_data') || '';
   }
 
-  checkServerIsLive(): Observable<any> {
+  public checkIfServerIsAlive(): Observable<any> {
     return this.http.get(environment.apiUrl + 'ping').pipe(
       catchError(error => {
         this.notification.open('Server is not alive', 'ok', notificationConfig);
@@ -33,7 +33,7 @@ export class AuthService {
       }));
   }
 
-  signIn(email: string, password: string): Observable<any> {
+  public signIn(email: string, password: string): Observable<any> {
     return this.http.post(environment.apiUrl + 'auth/login', { email, password }).pipe(
       catchError(error => {
         this.notification.open(error.error.message, 'ok', notificationConfig);
@@ -41,15 +41,15 @@ export class AuthService {
       }));
   }
 
-  signUp(name: string, email: string, password: string): Observable<any> {
-    return this.http.post(environment.apiUrl + 'auth/create', { name, email, password }).pipe(
+  public signUp(name: string, email: string, password: string): Observable<any> {
+    return this.http.post(environment.apiUrl + 'auth', { name, email, password }).pipe(
       catchError(error => {
         this.notification.open(error.error.message, 'ok', notificationConfig);
         return throwError(error);
       }));
   }
 
-  getUsers(): Observable<any> {
+  public getUsers(): Observable<any> {
     return this.http.get(environment.apiUrl + 'auth/users').pipe(
       catchError(error => {
         this.notification.open(error.error.message, 'ok', notificationConfig);

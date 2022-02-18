@@ -8,13 +8,13 @@ import { AuthService } from "./services/auth.service";
 })
 export class AppComponent implements OnInit, OnDestroy {
   public title = 'co-editing-test-app';
-  private interval: any;
+  private interval: number;
 
   constructor(private authService: AuthService) { }
 
   ngOnInit(): void {
     this.interval = setInterval(() => {
-      this.authService.checkServerIsLive().subscribe();
+      this.authService.checkIfServerIsAlive().subscribe();
     }, 5000);
   }
 

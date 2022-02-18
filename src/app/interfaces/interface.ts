@@ -17,9 +17,20 @@ export interface IUser {
   name: string;
   email: string;
   countOfMutations?: number;
+  isFavorite?: boolean;
 }
 
 export interface IMutation {
   userId: string;
   countOfMutations: number;
+}
+
+export interface IResponse {
+  message: null | string | IUser[] | IConversation | IConversation[];
+  ok: boolean;
+}
+
+export interface ITypesOfConversations {
+  favoriteConversations: IConversation[];
+  unfavoriteConversations: IConversation[];
 }

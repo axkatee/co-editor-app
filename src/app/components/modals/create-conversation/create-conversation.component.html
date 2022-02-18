@@ -4,7 +4,7 @@
     <input class="create-input" formControlName="name" placeholder="Conversation name">
   </form>
   <div class="action-btns" mat-dialog-actions>
-    <button class="red-btn" [disabled]="!conversationForm.valid" (click)="createConversation()">Create</button>
+    <button class="red-btn" [disabled]="conversationForm.invalid" (click)="createConversation()">Create</button>
     <button class="white-btn" (click)="closeDialog()">Close</button>
   </div>
 </div>
