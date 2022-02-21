@@ -16,12 +16,11 @@ export class DeleteConversationDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: IDialogData
   ) { }
 
-  closeDialog(): void {
-    this.dialogRef.close();
+  deleteConversation(conversationId: string): void {
+    this.closeDialog(conversationId);
   }
 
-  deleteConversation(conversationId: string): void {
-    this.projectService.deleteConversation(conversationId).subscribe();
-    this.closeDialog();
+  closeDialog(conversationId?: string): void {
+    this.dialogRef.close(conversationId);
   }
 }

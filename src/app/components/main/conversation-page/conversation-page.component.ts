@@ -1,63 +1,66 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import { Router } from "@angular/router";
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute } from "@angular/router";
+import { debounceTime, distinctUntilChanged, fromEvent, map, Subject, takeUntil } from "rxjs";
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { SocketService } from "../../../services/socket.service";
 import { ProjectService } from "../../../services/project.service";
-import { notificationConfig } from "../../../configs/matSnackbarConfig";
 import { IConversation, IMutation, IUser } from "../../../interfaces/interface";
-import { debounceTime, distinctUntilChanged, Subject } from "rxjs";
+import { notificationConfig } from "../../../configs/matSnackbarConfig";
 
 @Component({
   selector: 'app-conversation-page',
   templateUrl: './conversation-page.component.html',
   styleUrls: ['./conversation-page.component.less']
 })
-export class ConversationPageComponent implements OnInit {
+export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('textAreaElement') textAreaElement: ElementRef;
   public text = '';
   public users: IUser[] = [];
 
   private conversationId: string;
-  private textChange = new Subject();
+  private destroy$ = new Subject<boolean>();
 
   constructor(
+    private socketService: SocketService,
     private projectService: ProjectService,
     private notification: MatSnackBar,
-    private router: Router
+    private activatedRoute: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
-    this.conversationId = this.router.url.split('conversations/')[1];
-
-    this.textChange.pipe(
-      debounceTime(1000),
-      distinctUntilChanged(),
-    ).subscribe(() => this.saveConversation());
+    this.conversationId = this.activatedRoute.snapshot.params['id'];
 
     this.setConversationsUpdateHandler();
     this.getInfoAboutConversation();
   }
 
-  setConversationsUpdateHandler(): void {
-    this.projectService.conversations$.subscribe((conversations: IConversation[]) => {
-      const filteredConversations = this.projectService.filterConversationsResponse(conversations);
-      this.findCurrentConversation(filteredConversations);
+  ngAfterViewInit(): void {
+    const keyUp$ = fromEvent<KeyboardEvent>(this.textAreaElement.nativeElement, 'keyup').pipe(
+      takeUntil(this.destroy$),
+      map(event => (event.target as HTMLTextAreaElement).value),
+      debounceTime(1000),
+      distinctUntilChanged()
+    );
+    keyUp$.subscribe(value => {
+      this.text = value;
+      this.saveConversation();
     });
   }
 
-  findCurrentConversation(conversations: IConversation[]): void {
-    conversations.forEach(conversation => {
-      if (conversation.id === this.conversationId) {
-        this.setInfoAboutConversation(conversation);
-      }
+  setConversationsUpdateHandler(): void {
+    this.projectService.conversation$.subscribe((conversation: IConversation) => {
+      this.setInfoAboutConversation(conversation);
     });
   }
 
   getInfoAboutConversation(): void {
     this.projectService.getInfoAboutConversation(this.conversationId).subscribe(res => {
-      this.firstInitialize(res.message);
+      this.setInfoAboutConversation(res.message);
     });
   }
 
   setInfoAboutConversation(conversation: IConversation): void {
+    this.users = [conversation.author, ...conversation.contributors || []];
     this.text = conversation.text || '';
     this.users.forEach(user => {
       conversation.mutations.forEach((mutation: IMutation) => {
@@ -68,25 +71,17 @@ export class ConversationPageComponent implements OnInit {
       if (!user.countOfMutations && user.countOfMutations !== 0) {
         user.countOfMutations = 0;
       }
-    })
-  }
-
-  firstInitialize(conversation: IConversation): void {
-    this.text = conversation.text || '';
-    this.users.push(conversation.author);
-    conversation.contributors?.forEach((user: IUser) => {
-      this.users.push(user);
     });
-    this.setInfoAboutConversation(conversation);
-  }
-
-  onKeyDown(): void {
-    this.textChange.next(this.text);
   }
 
   saveConversation(): void {
-    this.projectService.editConversation(this.conversationId, this.text).subscribe(res => {
+    this.projectService.editConversation(this.conversationId, this.text).subscribe(() => {
       this.notification.open('Saved!', 'ok', notificationConfig);
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next(true);
+    this.destroy$.complete();
   }
 }

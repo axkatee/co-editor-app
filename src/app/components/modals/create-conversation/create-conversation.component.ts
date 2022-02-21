@@ -26,13 +26,10 @@ export class CreateConversationComponent implements OnInit {
 
   createConversation(): void {
     const name: string = this.conversationForm.controls['name'].value.toString();
-    this.projectService.createConversation(name).subscribe();
-
-    this.closeDialog();
+    this.closeDialog(name);
   }
 
-  closeDialog(): void {
-    this.dialogRef.close();
+  closeDialog(name?: string): void {
+    this.dialogRef.close(name);
   }
-
 }

@@ -1,7 +1,7 @@
 <button class="create-conversation" (click)="openDialog('createConversation')">+ create conversation</button>
 <button class="create-conversation" (click)="signOut()">sign out</button>
 <div class="main-block">
-  <div class="conversation-blocks" *ngFor="let conversation of (conversations | async)">
+  <div class="conversation-blocks" *ngFor="let conversation of (conversations$ | async)">
     <div class="title">Name: {{conversation.name}}</div>
     <input type="checkbox" id="favoritesCheckbox" [(ngModel)]="conversation.isFavorite" (change)="changeConversationFavoriteState(conversation)">
     <label for="favoritesCheckbox">Favorite</label>

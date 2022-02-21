@@ -5,7 +5,7 @@ import { FormGroup } from "@angular/forms";
 import { AuthService } from "../../../services/auth.service";
 import { FormService } from "../../../services/form.service";
 import { SocketService } from "../../../services/socket.service";
-import {IResponse} from "../../../interfaces/interface";
+import { IResponse } from "../../../interfaces/interface";
 
 @Component({
   selector: 'app-login-page',
@@ -21,9 +21,7 @@ export class LoginPageComponent implements OnInit {
     private authService: AuthService,
     private socketService: SocketService,
     private formService: FormService
-  ) {
-    this.socketService.removeUserSocketInfo();
-  }
+  ) { }
 
   ngOnInit(): void {
     this.loginForm = this.formService.loginForm();

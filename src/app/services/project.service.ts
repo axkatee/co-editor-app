@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { BehaviorSubject, catchError, Observable, throwError } from "rxjs";
+import { catchError, Observable, Subject, throwError } from "rxjs";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { environment } from "../../environments/environment";
 import { AuthService } from "./auth.service";
-import {IConversation, ITypesOfConversations, IUser} from "../interfaces/interface";
+import { environment } from "../../environments/environment";
+import { IConversation, ITypesOfConversations, IUser } from "../interfaces/interface";
 import { notificationConfig } from "../configs/matSnackbarConfig";
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProjectService {
-  public conversations$ = new BehaviorSubject<IConversation[]>([]);
+  public conversation$ = new Subject<IConversation>();
   private userId: string;
 
   constructor(
@@ -112,6 +112,7 @@ export class ProjectService {
         }
       }
     });
+
     return { favoriteConversations, unfavoriteConversations };
   }
 

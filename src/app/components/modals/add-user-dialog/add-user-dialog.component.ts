@@ -36,18 +36,18 @@ export class AddUserDialogComponent implements OnInit {
     });
   }
 
-  closeDialog(): void {
-    this.dialogRef.close();
-  }
-
   setUsers(users: IUser[]): void {
     this.users = users;
     this.users = this.users.filter(user => user.id !== this.authService.userId && !this.contributors?.includes(user.id));
   }
 
   addUserToConversation(conversationId: string): void {
-    this.selectedUser && this.projectService.addUserToConversation(conversationId, this.selectedUser).subscribe();
-    this.closeDialog();
+    this.selectedUser && this.closeDialog(conversationId, this.selectedUser);
+  }
+
+  closeDialog(conversationId?: string, selectedUser?: IUser): void {
+    const data = { conversationId, selectedUser }
+    this.dialogRef.close(data);
   }
 
 }

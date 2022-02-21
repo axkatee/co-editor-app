@@ -12,18 +12,10 @@ export class SocketService {
 
   constructor(
     private projectService: ProjectService) {
-    this.socket = io(environment.apiUrl)
+    this.socket = io(environment.apiUrl);
 
-    this.socket.on('setDataToConversations', (data: IConversation[]) => {
-      this.projectService.conversations$.next(data);
+    this.socket.on('setDataAboutConversation', (data: IConversation) => {
+      this.projectService.conversation$.next(data);
     });
-  }
-
-  setSocketInfo(id: string): void {
-    this.socket.emit('setUserSocketInfo', id);
-  }
-
-  removeUserSocketInfo(): void {
-    this.socket.emit('removeUserSocketInfo');
   }
 }

@@ -3,7 +3,9 @@ import { Router } from "@angular/router";
 import { BehaviorSubject } from "rxjs";
 import { AddUserDialogComponent } from "../../modals/add-user-dialog/add-user-dialog.component";
 import { InfoDialogComponent } from "../../modals/info-dialog/info-dialog.component";
-import { DeleteConversationDialogComponent } from "../../modals/delete-conversation-dialog/delete-conversation-dialog.component";
+import {
+  DeleteConversationDialogComponent
+} from "../../modals/delete-conversation-dialog/delete-conversation-dialog.component";
 import { CreateConversationComponent } from "../../modals/create-conversation/create-conversation.component";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
@@ -19,7 +21,7 @@ import { IConversation, IResponse } from "../../../interfaces/interface";
   styleUrls: ['./main-page.component.less']
 })
 export class MainPageComponent implements OnInit {
-  public conversations = new BehaviorSubject<IConversation[]>([]);
+  public conversations$ = new BehaviorSubject<IConversation[]>([]);
   private userId: string;
 
   constructor(
@@ -33,16 +35,7 @@ export class MainPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.userId = this.authService.userId;
-    this.socketService.setSocketInfo(this.authService.userId);
-
-    this.setConversationsUpdateHandler();
     this.getConversations();
-  }
-
-  setConversationsUpdateHandler(): void {
-    this.projectService.conversations$.subscribe((conversations: IConversation[]) => {
-      this.setConversations(conversations);
-    });
   }
 
   getConversations(): void {
@@ -55,7 +48,7 @@ export class MainPageComponent implements OnInit {
     const filteredConversations = this.projectService.filterConversationsResponse(conversations);
     const { favoriteConversations, unfavoriteConversations } = this.projectService.filterConversationsToFavoriteAndUnfavorite(filteredConversations);
     const conversationsToRender = this.projectService.setConversations(favoriteConversations, unfavoriteConversations);
-    this.conversations.next(conversationsToRender);
+    this.conversations$.next(conversationsToRender);
   }
 
   openConversation(conversation: IConversation): void {
@@ -63,26 +56,63 @@ export class MainPageComponent implements OnInit {
   }
 
   changeConversationFavoriteState(conversation: IConversation): void {
-    this.projectService.changeConversationFavouriteState(conversation.id, conversation.isFavorite).subscribe();
+    this.projectService.changeConversationFavouriteState(conversation.id, conversation.isFavorite).subscribe(
+      () => {
+        let newConversations = this.conversations$.getValue();
+        newConversations.forEach(conver => {
+           if (conver.id === conversation.id) {
+             conver.isFavorite = conversation.isFavorite;
+           }
+        });
+        newConversations = newConversations.sort((a,b) => (Number(b.isFavorite) || 0) - (Number(a.isFavorite) || 0));
+        this.conversations$.next(newConversations);
+      }
+    );
   }
 
   openDialog(dialogName: string, conversation?: IConversation): void {
     const dialogConfig = { data: { conversation } };
+    let dialogRef;
     switch (dialogName) {
       case 'addUser': {
-        this.dialog.open(AddUserDialogComponent, dialogConfig);
+        dialogRef = this.dialog.open(AddUserDialogComponent, dialogConfig);
+        dialogRef?.afterClosed().subscribe(data => {
+          if (data.selectedUser) {
+            this.projectService.addUserToConversation(data.conversationId, data.selectedUser).subscribe();
+            let newConversations = this.conversations$.getValue();
+            newConversations.map(conv => {
+              if (conv.id === conversation?.id) {
+                conv.contributors?.push(data.selectedUser);
+              }
+            })
+            this.conversations$.next(newConversations);
+          }
+        })
         break;
       }
       case 'showInfo': {
-        this.dialog.open(InfoDialogComponent, dialogConfig);
+        dialogRef = this.dialog.open(InfoDialogComponent, dialogConfig);
         break;
       }
       case 'delete': {
-        this.dialog.open(DeleteConversationDialogComponent, dialogConfig);
+        dialogRef = this.dialog.open(DeleteConversationDialogComponent, dialogConfig);
+        dialogRef?.afterClosed().subscribe(data => {
+          if (data) {
+            this.projectService.deleteConversation(data).subscribe();
+            this.conversations$.next([...this.conversations$.getValue().filter(conv => conv.id !== conversation?.id)]);
+          }
+        })
         break;
       }
       case 'createConversation': {
-        this.dialog.open(CreateConversationComponent, dialogConfig);
+        dialogRef = this.dialog.open(CreateConversationComponent, dialogConfig);
+        dialogRef?.afterClosed().subscribe(data => {
+          if (data) {
+            this.projectService.createConversation(data).subscribe(res => {
+              this.conversations$.next([...this.conversations$.getValue(), res.message]);
+            });
+          }
+        })
         break;
       }
       default: {

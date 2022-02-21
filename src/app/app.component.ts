@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AuthService } from "./services/auth.service";
+import { interval, Subject, takeUntil } from "rxjs";
 
 @Component({
   selector: 'app-root',
@@ -8,17 +9,18 @@ import { AuthService } from "./services/auth.service";
 })
 export class AppComponent implements OnInit, OnDestroy {
   public title = 'co-editing-test-app';
-  private interval: number;
+  private destroy$ = new Subject<boolean>();
 
   constructor(private authService: AuthService) { }
 
   ngOnInit(): void {
-    this.interval = setInterval(() => {
-      this.authService.checkIfServerIsAlive().subscribe();
-    }, 5000);
+    interval(5000).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(() => this.authService.checkIfServerIsAlive().subscribe());
   }
 
   ngOnDestroy(): void {
-    clearInterval(this.interval);
+    this.destroy$.next(true);
+    this.destroy$.complete();
   }
 }
