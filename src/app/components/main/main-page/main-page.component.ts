@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from "@angular/router";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, Subject, takeUntil } from "rxjs";
 import { AddUserDialogComponent } from "../../modals/add-user-dialog/add-user-dialog.component";
 import { InfoDialogComponent } from "../../modals/info-dialog/info-dialog.component";
 import {
@@ -20,9 +20,11 @@ import { IConversation, IResponse, IUser } from "../../../interfaces/interface";
   templateUrl: './main-page.component.html',
   styleUrls: ['./main-page.component.less']
 })
-export class MainPageComponent implements OnInit {
+export class MainPageComponent implements OnInit, OnDestroy {
   public conversations$ = new BehaviorSubject<IConversation[]>([]);
+
   private userId: string;
+  private destroy$ = new Subject<boolean>();
 
   constructor(
     private projectService: ProjectService,
@@ -37,11 +39,15 @@ export class MainPageComponent implements OnInit {
     this.userId = this.authService.userId;
     this.getConversations();
 
-    this.projectService.conversation$.subscribe(conversation => {
+    this.projectService.conversation$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(conversation => {
       this.pushNewConversationIfCurrentUserIsContributor(conversation);
     });
 
-    this.projectService.deletedConversationId$.subscribe(conversationId => {
+    this.projectService.deletedConversationId$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(conversationId => {
       this.deleteConversationIfCurrentUserIsContributor(conversationId);
     });
   }
@@ -88,7 +94,7 @@ export class MainPageComponent implements OnInit {
   }
 
   changeConversationFavoriteState(conversation: IConversation): void {
-    this.projectService.changeConversationFavouriteState(conversation.id, conversation.isFavorite).subscribe(
+    this.projectService.changeConversationFavoriteState(conversation.id, conversation.isFavorite).subscribe(
       () => {
         let newConversations = this.conversations$.getValue();
         newConversations.forEach(conver => {
@@ -159,5 +165,10 @@ export class MainPageComponent implements OnInit {
   signOut(): void {
     localStorage.removeItem('auth_data');
     this.router.navigate(['/login']).then();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next(true);
+    this.destroy$.complete();
   }
 }

@@ -49,7 +49,7 @@ export class ProjectService {
 
   public editConversation(conversationId: string, text: string): Observable<any> {
     this.userId = this.authService.userId;
-    return this.http.post(environment.apiUrl + 'conversation/mutations', { conversationId, text, userId: this.userId }).pipe(
+    return this.http.patch(environment.apiUrl + 'conversation/mutations', { conversationId, text, userId: this.userId }).pipe(
       catchError(error => {
         this.notification.open(error.error.message, 'ok', notificationConfig);
         return throwError(error);
@@ -67,16 +67,16 @@ export class ProjectService {
 
   public addUserToConversation(conversationId: string, userId: IUser): Observable<any> {
     this.userId = this.authService.userId;
-    return this.http.post(environment.apiUrl + 'conversation/user/add', { conversationId, author: this.userId, invitedUser: userId }).pipe(
+    return this.http.patch(environment.apiUrl + 'conversation/invite', { conversationId, author: this.userId, invitedUser: userId }).pipe(
       catchError(error => {
         this.notification.open(error.error.message, 'ok', notificationConfig);
         return throwError(error);
       }));
   }
 
-  public changeConversationFavouriteState(conversationId: string, isFavorite: boolean): Observable<any> {
+  public changeConversationFavoriteState(conversationId: string, isFavorite: boolean): Observable<any> {
     this.userId = this.authService.userId;
-    return this.http.post(environment.apiUrl + 'conversation/favorite', { conversationId, userId: this.userId, isFavorite }).pipe(
+    return this.http.patch(environment.apiUrl + 'conversation/favorite', { conversationId, userId: this.userId, isFavorite }).pipe(
       catchError(error => {
         this.notification.open(error.error.message, 'ok', notificationConfig);
         return throwError(error);

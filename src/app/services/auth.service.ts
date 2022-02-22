@@ -34,7 +34,7 @@ export class AuthService {
   }
 
   public signIn(email: string, password: string): Observable<any> {
-    return this.http.post(environment.apiUrl + 'auth/login', { email, password }).pipe(
+    return this.http.get(environment.apiUrl + `auth/login?email=${email}&password=${password}`).pipe(
       catchError(error => {
         this.notification.open(error.error.message, 'ok', notificationConfig);
         return throwError(error);

@@ -1,7 +1,7 @@
 export interface IConversation {
   id: string;
   name: string;
-  mutations: IMutation[];
+  mutations: any;
   author: IUser;
   contributors?: IUser[];
   text?: string;
@@ -18,11 +18,6 @@ export interface IUser {
   email: string;
   countOfMutations?: number;
   isFavorite?: boolean;
-}
-
-export interface IMutation {
-  userId: string;
-  countOfMutations: number;
 }
 
 export interface IResponse {
