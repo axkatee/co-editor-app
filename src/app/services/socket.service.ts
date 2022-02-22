@@ -14,8 +14,11 @@ export class SocketService {
     private projectService: ProjectService) {
     this.socket = io(environment.apiUrl);
 
-    this.socket.on('setDataAboutConversation', (data: IConversation) => {
-      this.projectService.conversation$.next(data);
+    this.socket.on('setDataAboutConversation', (conversation: IConversation) => {
+      this.projectService.conversation$.next(conversation);
+    });
+    this.socket.on('deleteConversation', (conversationId: string) => {
+      this.projectService.deletedConversationId$.next(conversationId);
     });
   }
 }

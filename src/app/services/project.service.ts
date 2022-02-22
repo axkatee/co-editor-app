@@ -12,6 +12,7 @@ import { notificationConfig } from "../configs/matSnackbarConfig";
 })
 export class ProjectService {
   public conversation$ = new Subject<IConversation>();
+  public deletedConversationId$ = new Subject<string>();
   private userId: string;
 
   constructor(

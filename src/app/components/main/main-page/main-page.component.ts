@@ -13,7 +13,7 @@ import { AuthService } from "../../../services/auth.service";
 import { ProjectService } from "../../../services/project.service";
 import { SocketService } from "../../../services/socket.service";
 import { notificationConfig } from "../../../configs/matSnackbarConfig";
-import { IConversation, IResponse } from "../../../interfaces/interface";
+import { IConversation, IResponse, IUser } from "../../../interfaces/interface";
 
 @Component({
   selector: 'app-main-page',
@@ -36,12 +36,44 @@ export class MainPageComponent implements OnInit {
   ngOnInit(): void {
     this.userId = this.authService.userId;
     this.getConversations();
+
+    this.projectService.conversation$.subscribe(conversation => {
+      this.pushNewConversationIfCurrentUserIsContributor(conversation);
+    });
+
+    this.projectService.deletedConversationId$.subscribe(conversationId => {
+      this.deleteConversationIfCurrentUserIsContributor(conversationId);
+    });
   }
 
   getConversations(): void {
     this.projectService.getConversations().subscribe((res: IResponse) => {
       this.setConversations(res.message);
     });
+  }
+
+  pushNewConversationIfCurrentUserIsContributor(conversation: IConversation): void {
+    const isContributorCurrentUser = conversation.contributors?.find((user: IUser) => user.id === this.userId);
+    const isConversationExistOnPage = this.conversations$.getValue().find(conv => conv.id === conversation.id);
+
+    if (isContributorCurrentUser) {
+      if (!isConversationExistOnPage) {
+        this.conversations$.next([...this.conversations$.getValue(), conversation]);
+      } else {
+        const modifiedConversations = this.conversations$.getValue().map(conv => {
+          if (conv.id === conversation.id) {
+            conv = conversation;
+          }
+          return conv;
+        });
+        this.conversations$.next(modifiedConversations);
+      }
+    }
+  }
+
+  deleteConversationIfCurrentUserIsContributor(conversationId: string): void {
+    const modifiedConversations = this.conversations$.getValue().filter(conv => conv.id !== conversationId);
+    this.conversations$.next(modifiedConversations);
   }
 
   setConversations(conversations: any): void {
@@ -78,16 +110,17 @@ export class MainPageComponent implements OnInit {
         dialogRef = this.dialog.open(AddUserDialogComponent, dialogConfig);
         dialogRef?.afterClosed().subscribe(data => {
           if (data.selectedUser) {
-            this.projectService.addUserToConversation(data.conversationId, data.selectedUser).subscribe();
-            let newConversations = this.conversations$.getValue();
-            newConversations.map(conv => {
-              if (conv.id === conversation?.id) {
-                conv.contributors?.push(data.selectedUser);
-              }
-            })
-            this.conversations$.next(newConversations);
+            this.projectService.addUserToConversation(data.conversationId, data.selectedUser).subscribe(() => {
+              let newConversations = this.conversations$.getValue();
+              newConversations.map(conv => {
+                if (conv.id === conversation?.id) {
+                  conv.contributors?.push(data.selectedUser);
+                }
+              })
+              this.conversations$.next(newConversations);
+            });
           }
-        })
+        });
         break;
       }
       case 'showInfo': {
@@ -98,10 +131,11 @@ export class MainPageComponent implements OnInit {
         dialogRef = this.dialog.open(DeleteConversationDialogComponent, dialogConfig);
         dialogRef?.afterClosed().subscribe(data => {
           if (data) {
-            this.projectService.deleteConversation(data).subscribe();
-            this.conversations$.next([...this.conversations$.getValue().filter(conv => conv.id !== conversation?.id)]);
+            this.projectService.deleteConversation(data).subscribe(() => {
+              this.conversations$.next([...this.conversations$.getValue().filter(conv => conv.id !== conversation?.id)]);
+            });
           }
-        })
+        });
         break;
       }
       case 'createConversation': {
@@ -112,7 +146,7 @@ export class MainPageComponent implements OnInit {
               this.conversations$.next([...this.conversations$.getValue(), res.message]);
             });
           }
-        })
+        });
         break;
       }
       default: {
