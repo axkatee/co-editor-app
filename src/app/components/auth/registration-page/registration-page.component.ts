@@ -33,6 +33,7 @@ export class RegistrationPageComponent implements OnInit {
     const name = this.registrationForm.controls['name'].value;
     const email = this.registrationForm.controls['email'].value;
     const password = this.registrationForm.controls['password'].value;
+
     this.authService.signUp(name, email, password).subscribe(() => {
       this.router.navigate(['/login']).then();
     });

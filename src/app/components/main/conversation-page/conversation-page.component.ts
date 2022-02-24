@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import {ActivatedRoute, Router} from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { debounceTime, distinctUntilChanged, fromEvent, map, Subject, takeUntil } from "rxjs";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { SocketService } from "../../../services/socket.service";
@@ -72,6 +72,7 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
   setInfoAboutConversation(conversation: IConversation): void {
     this.users = [conversation.author, ...conversation.contributors || []];
     this.text = conversation.text || '';
+
     this.users.forEach(user => {
       Object.keys(conversation.mutations).forEach(id => {
         if (id === user.id) {

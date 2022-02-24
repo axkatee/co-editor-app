@@ -38,7 +38,24 @@ export class MainPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.userId = this.authService.userId;
     this.getConversations();
+    this.setConversationsUpdateHandler();
 
+  }
+
+  getConversations(): void {
+    this.projectService.getConversations().subscribe((res: IResponse) => {
+      this.setConversations(res.message);
+    });
+  }
+
+  setConversations(conversations: any): void {
+    const filteredConversations = this.projectService.filterConversationsResponse(conversations);
+    const { favoriteConversations, unfavoriteConversations } = this.projectService.filterConversationsToFavoriteAndUnfavorite(filteredConversations);
+    const conversationsToRender = this.projectService.setConversations(favoriteConversations, unfavoriteConversations);
+    this.conversations$.next(conversationsToRender);
+  }
+
+  setConversationsUpdateHandler(): void {
     this.projectService.conversation$.pipe(
       takeUntil(this.destroy$)
     ).subscribe(conversation => {
@@ -49,12 +66,6 @@ export class MainPageComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe(conversationId => {
       this.deleteConversationIfCurrentUserIsContributor(conversationId);
-    });
-  }
-
-  getConversations(): void {
-    this.projectService.getConversations().subscribe((res: IResponse) => {
-      this.setConversations(res.message);
     });
   }
 
@@ -82,30 +93,23 @@ export class MainPageComponent implements OnInit, OnDestroy {
     this.conversations$.next(modifiedConversations);
   }
 
-  setConversations(conversations: any): void {
-    const filteredConversations = this.projectService.filterConversationsResponse(conversations);
-    const { favoriteConversations, unfavoriteConversations } = this.projectService.filterConversationsToFavoriteAndUnfavorite(filteredConversations);
-    const conversationsToRender = this.projectService.setConversations(favoriteConversations, unfavoriteConversations);
-    this.conversations$.next(conversationsToRender);
-  }
-
-  openConversation(conversation: IConversation): void {
-    this.router.navigate([`/conversations/${conversation.id}`]).then();
-  }
-
   changeConversationFavoriteState(conversation: IConversation): void {
     this.projectService.changeConversationFavoriteState(conversation.id, conversation.isFavorite).subscribe(
       () => {
         let newConversations = this.conversations$.getValue();
         newConversations.forEach(conver => {
-           if (conver.id === conversation.id) {
-             conver.isFavorite = conversation.isFavorite;
-           }
+          if (conver.id === conversation.id) {
+            conver.isFavorite = conversation.isFavorite;
+          }
         });
         newConversations = newConversations.sort((a,b) => (Number(b.isFavorite) || 0) - (Number(a.isFavorite) || 0));
         this.conversations$.next(newConversations);
       }
     );
+  }
+
+  openConversation(conversation: IConversation): void {
+    this.router.navigate([`/conversations/${conversation.id}`]).then();
   }
 
   openDialog(dialogName: string, conversation?: IConversation): void {

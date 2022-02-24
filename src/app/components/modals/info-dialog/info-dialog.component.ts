@@ -26,5 +26,4 @@ export class InfoDialogComponent implements OnInit {
   closeDialog(): void {
     this.dialogRef.close();
   }
-
 }

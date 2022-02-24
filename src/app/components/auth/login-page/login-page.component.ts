@@ -34,6 +34,7 @@ export class LoginPageComponent implements OnInit {
   login(): void {
     const email = this.loginForm.controls['email'].value.toString();
     const password = this.loginForm.controls['password'].value.toString();
+
     this.authService.signIn(email, password).subscribe((res: IResponse) => {
       localStorage.setItem('auth_data', res.message as string);
       this.router.navigate(['/conversations']).then();
